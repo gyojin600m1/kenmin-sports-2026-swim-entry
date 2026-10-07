@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0a1628">
+<title>県民スポーツ大会 水泳 エントリー検索</title>
+<style>
+:root{--bg:#1a1a2e;--surface:#16213e;--surface2:#0f3460;--accent:#00c4ff;--accent2:#0077cc;--male:#1565c0;--female:#b71c6e;--open:#c77700;--hl:#ffd54f;--text:#e8f0fe;--text2:#8ca0c0;--border:#1e3050;--card-bg:#13203a;--radius:12px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Hiragino Kaku Gothic ProN','Hiragino Sans','Noto Sans JP','Meiryo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:40px;max-width:440px;margin:0 auto;}
+/* ===ヘッダー=== */
+.header{background:linear-gradient(135deg,#0a1628,#0d1f3c);border-bottom:1px solid var(--border);padding:16px 16px 0;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,0.5);}
+.header-top{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.header-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.header-title{font-size:16px;font-weight:700;color:var(--text);line-height:1.2;}
+.header-sub{font-size:11px;color:var(--text2);margin-top:2px;}
+/* ===タブ=== */
+.tabs{display:flex;margin-bottom:14px;border-radius:10px;overflow:hidden;border:1px solid var(--border);}
+.tab{flex:1;padding:9px 0;text-align:center;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;background:var(--surface2);transition:all 0.2s;-webkit-tap-highlight-color:transparent;}
+.tab.active{background:linear-gradient(135deg,var(--accent2),#005fa3);color:#fff;}
+/* ===性別フィルター=== */
+.gender-filter{display:flex;gap:6px;margin-bottom:12px;}
+.gchip{flex:1;padding:8px 0;text-align:center;font-size:13px;font-weight:700;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.gchip.active-all{background:var(--accent2);border-color:var(--accent);color:#fff;}
+.gchip.active-male{background:var(--male);border-color:var(--male);color:#fff;}
+.gchip.active-female{background:var(--female);border-color:var(--female);color:#fff;}
+/* ===検索エリア=== */
+.search-wrap{display:flex;gap:8px;margin-bottom:10px;}
+.search-input{flex:1;min-width:0;padding:12px 16px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:16px;font-family:inherit;outline:none;}
+.search-input::placeholder{color:var(--text2);}
+.search-input:focus{border-color:var(--accent);}
+.search-btn{padding:12px 18px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:var(--radius);color:#fff;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;}
+.chips-label{font-size:11px;color:var(--text2);margin:0 0 6px 2px;}
+.chips-scroll{overflow-x:auto;white-space:nowrap;padding-bottom:12px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.chips-scroll::-webkit-scrollbar{display:none;}
+.chip{display:inline-block;padding:5px 12px;margin-right:6px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;font-size:12px;color:var(--text2);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.chip.active{background:var(--accent2);border-color:var(--accent);color:#fff;}
+/* ===種目セレクト=== */
+.program-select-wrap{margin-bottom:14px;}
+.program-select{width:100%;padding:12px 14px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:15px;font-family:inherit;outline:none;appearance:none;-webkit-appearance:none;}
+.program-select:focus{border-color:var(--accent);}
+.program-select option{background:#1a2234;color:#e8f0fe;}
+.program-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:var(--radius);color:#fff;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:8px;-webkit-tap-highlight-color:transparent;}
+.nav-row{display:flex;gap:8px;margin-top:8px;}
+.nav-btn{flex:1;padding:10px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.nav-btn:disabled{opacity:0.35;}
+.hl-row{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12px;color:var(--text2);}
+.hl-select{flex:1;padding:8px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:inherit;appearance:none;-webkit-appearance:none;}
+/* ===パネル=== */
+.panel{display:none;}
+.panel.active{display:block;}
+.main{padding:12px 12px 0;}
+/* ===ステータスバー=== */
+.status-bar{font-size:12px;color:var(--text2);padding:8px 4px;text-align:center;}
+.status-bar span{color:var(--accent);font-weight:600;}
+/* ===選手カード=== */
+.swimmer-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;overflow:hidden;}
+.card-header{padding:14px 14px 10px;}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+.swimmer-name{font-size:16px;font-weight:700;color:var(--text);flex:1;}
+.badge{font-size:11px;background:var(--accent2);color:#fff;border-radius:10px;padding:2px 9px;white-space:nowrap;flex-shrink:0;margin-top:2px;}
+.card-meta{display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap;}
+.swimmer-team{font-size:13px;color:var(--text2);}
+.age-tag{font-size:11px;color:var(--text2);background:var(--surface2);border-radius:6px;padding:1px 7px;}
+.gen-tag{font-size:11px;border-radius:6px;padding:1px 8px;font-weight:700;}
+.gen-tag.male{background:var(--male);color:#fff;}
+.gen-tag.female{background:var(--female);color:#fff;}
+.open-tag{font-size:11px;border-radius:6px;padding:1px 8px;font-weight:700;background:var(--open);color:#fff;}
+.details{border-top:1px solid var(--border);}
+.detail-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid rgba(30,48,80,0.6);font-size:13px;color:var(--text);line-height:1.5;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.detail-item:last-child{border-bottom:none;}
+.detail-main{flex:1;}
+.detail-sub{font-size:12px;color:var(--text2);}
+.lane-big{color:var(--accent);font-weight:700;}
+.go{font-size:11px;color:var(--accent);white-space:nowrap;}
+/* ===種目（スタートリスト）=== */
+.program-title{font-size:15px;font-weight:700;color:var(--accent);padding:10px 4px 4px;}
+.program-info{font-size:12px;color:var(--text2);padding:0 4px 10px;border-bottom:1px solid var(--border);margin-bottom:10px;}
+.program-info b{color:var(--text);}
+.heat-title{font-size:13px;font-weight:700;padding:8px 4px 6px;color:var(--text);}
+.heat-title.male{color:#64a8ff;}
+.heat-title.female{color:#ff7ab8;}
+.lane-row{display:flex;align-items:center;gap:10px;background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:9px 12px;margin-bottom:6px;}
+.lane-row.empty{opacity:0.35;padding:5px 12px;}
+.lane-row.hl{border-color:var(--hl);box-shadow:0 0 0 1px var(--hl) inset;}
+.lane-row.me{border-color:var(--accent);background:rgba(0,196,255,0.12);}
+.lane-no{width:26px;height:26px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+.lane-body{flex:1;min-width:0;}
+.lane-name{font-size:15px;font-weight:700;}
+.lane-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:2px;}
+/* ===競技順序=== */
+.order-row{display:flex;align-items:center;gap:10px;background:var(--card-bg);border:1px solid var(--border);border-left:4px solid var(--male);border-radius:10px;padding:10px 12px;margin-bottom:6px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.order-row.female{border-left-color:var(--female);}
+.order-row.next{border-color:var(--hl);border-left-color:var(--hl);}
+.order-time{font-size:14px;font-weight:700;color:var(--accent);width:44px;flex-shrink:0;}
+.order-body{flex:1;min-width:0;}
+.order-name{font-size:14px;font-weight:700;}
+.order-sub{font-size:12px;color:var(--text2);margin-top:2px;}
+.order-no{font-size:11px;color:var(--text2);}
+.order-foot{font-size:12px;color:var(--text2);text-align:center;padding:10px 0;line-height:1.8;}
+/* ===その他=== */
+.no-result{text-align:center;padding:60px 20px;color:var(--text2);}
+.no-result .emoji{font-size:40px;margin-bottom:12px;}
+.initial-state{text-align:center;padding:40px 20px;color:var(--text2);}
+.initial-state .emoji{font-size:48px;margin-bottom:16px;}
+.initial-state h3{font-size:16px;color:var(--text);margin-bottom:8px;}
+.initial-state p{font-size:13px;line-height:1.7;}
+.stats-row{display:flex;justify-content:center;gap:24px;margin-top:20px;}
+.stat-item{text-align:center;}
+.stat-num{font-size:22px;font-weight:700;color:var(--accent);}
+.stat-label{font-size:11px;color:var(--text2);margin-top:2px;}
+.docs{margin-top:24px;background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:14px;}
+.docs-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;}
+.docs a{display:block;padding:9px 2px;font-size:13px;color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(30,48,80,0.6);}
+.docs a:last-child{border-bottom:none;}
+.source{font-size:11px;color:var(--text2);line-height:1.7;padding:24px 8px 0;text-align:center;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="header-icon">🏊</div>
+    <div>
+      <div class="header-title">R8 県民スポーツ大会（水泳）</div>
+      <div class="header-sub">10/11(日) 大和村民プール｜選手・地区・種目から検索</div>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab(1)">🔍 選手・地区</div>
+    <div class="tab" onclick="switchTab(2)">📋 種目検索</div>
+    <div class="tab" onclick="switchTab(3)">⏱ 競技順序</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- タブ1: 選手・地区検索 -->
+  <div class="panel active" id="panel1">
+    <div class="gender-filter" id="gf1">
+      <div class="gchip active-all" onclick="setGender(1,'all',this)">全員</div>
+      <div class="gchip" onclick="setGender(1,'male',this)">🔵 男子</div>
+      <div class="gchip" onclick="setGender(1,'female',this)">🔴 女子</div>
+    </div>
+    <div class="search-wrap">
+      <input type="text" class="search-input" id="searchInput" placeholder="名前・地区名を入力…" inputmode="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      <button class="search-btn" onclick="doSearch()">検索</button>
+    </div>
+    <div class="chips-label">クラス</div>
+    <div class="chips-scroll" id="classArea"></div>
+    <div class="chips-label">地区</div>
+    <div class="chips-scroll" id="chipsArea"></div>
+    <div id="statusBar1" class="status-bar" style="display:none"></div>
+    <div id="result1">
+      <div class="initial-state">
+        <div class="emoji">🔍</div>
+        <h3>選手・地区を検索</h3>
+        <p>名前（苗字のみでも可）または<br>地区名を入力してください</p>
+        <div class="stats-row">
+          <div class="stat-item"><div class="stat-num" id="totalCount">-</div><div class="stat-label">総エントリー数</div></div>
+          <div class="stat-item"><div class="stat-num" id="swimmerCount">-</div><div class="stat-label">参加選手数</div></div>
+          <div class="stat-item"><div class="stat-num" id="teamCount">-</div><div class="stat-label">参加地区数</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- タブ2: 種目検索 -->
+  <div class="panel" id="panel2">
+    <div class="gender-filter" id="gf2">
+      <div class="gchip active-all" onclick="setGender(2,'all',this)">全員</div>
+      <div class="gchip" onclick="setGender(2,'male',this)">🔵 男子</div>
+      <div class="gchip" onclick="setGender(2,'female',this)">🔴 女子</div>
+    </div>
+    <div class="program-select-wrap">
+      <select class="program-select" id="programSelect" onchange="searchByProgram()"><option value="">── 種目を選んでください ──</option></select>
+      <div class="nav-row">
+        <button class="nav-btn" id="prevBtn" onclick="stepProgram(-1)">◀ 前の種目</button>
+        <button class="nav-btn" id="nextBtn" onclick="stepProgram(1)">次の種目 ▶</button>
+      </div>
+      <div class="hl-row">⭐ 地区を目立たせる
+        <select class="hl-select" id="hlSelect" onchange="setHighlight(this.value)"><option value="">なし</option></select>
+      </div>
+    </div>
+    <div id="statusBar2" class="status-bar" style="display:none"></div>
+    <div id="result2">
+      <div class="initial-state"><div class="emoji">📋</div><h3>種目から選手を検索</h3><p>上のリストから種目を選ぶと<br>組・レーンごとの出場選手を表示します</p></div>
+    </div>
+  </div>
+
+  <!-- タブ3: 競技順序 -->
+  <div class="panel" id="panel3">
+    <div class="gender-filter" id="gf3">
+      <div class="gchip active-all" onclick="setGender(3,'all',this)">全員</div>
+      <div class="gchip" onclick="setGender(3,'male',this)">🔵 男子</div>
+      <div class="gchip" onclick="setGender(3,'female',this)">🔴 女子</div>
+    </div>
+    <div id="statusBar3" class="status-bar" style="display:none"></div>
+    <div id="result3"></div>
+  </div>
+
+  <div class="docs">
+    <div class="docs-title">📄 確認資料を開く（鹿児島県水泳連盟）</div>
+    <a href="https://www.kagoshima-swim.com/new/wp-content/uploads/2026/10/20261011_program.pdf" target="_blank" rel="noopener">プログラム（このアプリの元データ）</a>
+    <a href="https://www.kagoshima-swim.com/new/wp-content/uploads/2026/10/eb6dfaf0f8749c0f92deea8338fe23bf.pdf" target="_blank" rel="noopener">二次要項（監督者会議資料）</a>
+    <a href="https://www.kagoshima-swim.com/new/wp-content/uploads/2026/10/686c68673277bf68d958d799a02283b5.pdf" target="_blank" rel="noopener">式典要項</a>
+    <a href="https://www.kagoshima-swim.com/new/wp-content/uploads/2026/10/4669715883efe2fc3205bc3dbb9511c7.pdf" target="_blank" rel="noopener">会場図</a>
+    <a href="https://www.kagoshima-swim.com/new/wp-content/uploads/2026/07/20261011_001.pdf" target="_blank" rel="noopener">大会要項</a>
+    <a href="https://www.kagoshima-swim.com/competition/%e3%80%90%e5%a4%a7%e4%bc%9a%e6%a1%88%e5%86%85%e3%80%91%e4%bb%a4%e5%92%8c%ef%bc%98%e5%b9%b4%e5%ba%a6%e7%9c%8c%e6%b0%91%e3%82%b9%e3%83%9d%e3%83%bc%e3%83%84%e5%a4%a7%e4%bc%9a%ef%bc%88%e6%b0%b4%e6%b3%b3/" target="_blank" rel="noopener">大会ページ（鹿児島県水泳連盟）</a>
+  </div>
+  <div class="source">
+    出典：鹿児島県水泳連盟「令和８年度県民スポーツ大会（水泳競技）」プログラム（PDF・2026年10月7日掲載分）から作成した非公式アプリです。<br>
+    正式な内容は当日配布のプログラム・会場の掲示でご確認ください。
+  </div>
+</div>
+
+<script>
+// [No, 氏名, 読み, 地区, 地区略称, 学年, クラス, 性別("女"=女子/""=男子), [[泳法, 距離, タイム, 競技No, 組, レーン, OPEN], ...]]
+const RAW = DATA_PLACEHOLDER;
+// [競技No, クラス, 性別, 距離, 泳法, 時刻, 組数, 大会記録]
+const PROG_RAW = PROG_PLACEHOLDER;
+const MEET_DATE = '2026-10-11';
+
+const sw = RAW.map((d,i)=>({idx:i,no:d[0],name:d[1],yomi:d[2],sc:d[3],scy:d[4],gr:d[5],age:d[6],gen:d[7],ev:d[8].map(e=>({st:e[0],di:e[1],tm:e[2],pno:e[3],heat:e[4],lane:e[5],open:!!e[6]}))}));
+const PROG = PROG_RAW.map(p=>({no:p[0],cls:p[1],sex:p[2],di:p[3],st:p[4],time:p[5],heats:p[6],rec:p[7]}));
+const progByNo = {}; PROG.forEach(p=>progByNo[p.no]=p);
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function normalize(s){return s?s.replace(/[\s　]+/g,'').toLowerCase():'';}
+function isFemale(s){return s.gen==='女';}
+function isMale(s){return !isFemale(s);}
+function progLabel(p){return `${p.cls}${p.sex} ${p.di} ${p.st}`;}
+function genMatch(gen,isF){return gen==='all'||(gen==='female')===isF;}
+function tags(s,e){
+  const g=isFemale(s);
+  return `<span class="swimmer-team">🏊 ${esc(s.sc)}</span><span class="age-tag">${esc(s.age)}</span>${s.gr?`<span class="age-tag">${esc(s.gr)}</span>`:''}<span class="gen-tag ${g?'female':'male'}">${g?'女子':'男子'}</span>${e&&e.open?'<span class="open-tag">OPEN</span>':''}`;
+}
+
+// 統計
+document.getElementById('totalCount').textContent=sw.reduce((a,s)=>a+s.ev.length,0).toLocaleString();
+document.getElementById('swimmerCount').textContent=sw.length.toLocaleString();
+const teamCount={};
+sw.forEach(s=>{teamCount[s.sc]=(teamCount[s.sc]||0)+s.ev.length;});
+document.getElementById('teamCount').textContent=Object.keys(teamCount).length;
+
+// 地区チップ（人数の多い順）
+const teamsSorted=Object.entries(teamCount).sort((a,b)=>b[1]-a[1]).map(e=>e[0]);
+const chipsArea=document.getElementById('chipsArea');
+teamsSorted.forEach(t=>{const c=document.createElement('span');c.className='chip';c.textContent=`${t}（${teamCount[t]}）`;c.onclick=()=>quickSearch(t,c);chipsArea.appendChild(c);});
+
+// クラスチップ
+const CLASSES=['成年','30歳以上','40歳以上','50歳以上','60歳以上','70歳以上'];
+let classFilter='';
+const classArea=document.getElementById('classArea');
+['',...CLASSES].forEach(cl=>{
+  const c=document.createElement('span');c.className='chip'+(cl===''?' active':'');c.textContent=cl||'全クラス';
+  c.onclick=()=>{classFilter=cl;classArea.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));c.classList.add('active');doSearch();};
+  classArea.appendChild(c);
+});
+
+// 地区ハイライト
+const hlSelect=document.getElementById('hlSelect');
+teamsSorted.forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;hlSelect.appendChild(o);});
+let highlightTeam='';
+try{highlightTeam=localStorage.getItem('hl_team')||'';}catch(e){}
+if(!teamCount[highlightTeam])highlightTeam='';
+hlSelect.value=highlightTeam;
+function setHighlight(v){highlightTeam=v;try{localStorage.setItem('hl_team',v);}catch(e){}searchByProgram();}
+
+// 性別フィルター状態
+const genderState={1:'all',2:'all',3:'all'};
+function setGender(tab,val,el){
+  genderState[tab]=val;
+  document.getElementById('gf'+tab).querySelectorAll('.gchip').forEach(c=>{c.className='gchip';});
+  el.classList.add(val==='all'?'active-all':val==='male'?'active-male':'active-female');
+  if(tab===1)doSearch();
+  else if(tab===2){buildProgramSelect();searchByProgram();}
+  else if(tab===3)showOrder();
+}
+
+// タブ切替
+function switchTab(n){
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===n-1));
+  document.querySelectorAll('.panel').forEach((p,i)=>p.classList.toggle('active',i===n-1));
+  window.scrollTo(0,0);
+  if(n===3)showOrder();
+}
+
+// タブ1: 選手検索
+function doSearch(kw){
+  const input=document.getElementById('searchInput');
+  const raw=kw||input.value;
+  const keyword=normalize(raw);
+  const container=document.getElementById('result1');
+  const statusBar=document.getElementById('statusBar1');
+  const gen=genderState[1];
+  if(!keyword&&!classFilter){container.innerHTML='<div class="initial-state"><div class="emoji">🔍</div><h3>キーワードを入力してください</h3><p>地区やクラスのボタンからも探せます</p></div>';statusBar.style.display='none';return;}
+  let results=sw.filter(s=>!keyword||normalize(s.name).includes(keyword)||normalize(s.sc).includes(keyword)||normalize(s.scy).includes(keyword));
+  if(classFilter)results=results.filter(s=>s.age===classFilter);
+  results=results.filter(s=>genMatch(gen,isFemale(s)));
+  results.sort((a,b)=>a.ev[0].pno-b.ev[0].pno||a.ev[0].heat-b.ev[0].heat||a.ev[0].lane-b.ev[0].lane);
+  statusBar.style.display='block';
+  statusBar.innerHTML=results.length?`<span>${results.length}</span>名が見つかりました（競技順）`:`該当する選手が見つかりませんでした`;
+  if(!results.length){container.innerHTML=`<div class="no-result"><div class="emoji">😓</div><p>「${esc(raw||classFilter)}」に一致するエントリーがありません</p></div>`;return;}
+  container.innerHTML='';
+  results.forEach(s=>{
+    const card=document.createElement('div');card.className='swimmer-card';
+    const rows=s.ev.map(e=>{const p=progByNo[e.pno];return `<div class="detail-item" onclick="openProgram(${e.pno},${s.idx})"><div class="detail-main">No.${p.no}　${esc(progLabel(p))}<div class="detail-sub">${p.time}〜　<span class="lane-big">${e.heat}組 ${e.lane}レーン</span></div></div><div class="go">組を見る ▶</div></div>`;}).join('');
+    card.innerHTML=`<div class="card-header"><div class="card-top"><div class="swimmer-name">${esc(s.name)}</div><div class="badge">${progByNo[s.ev[0].pno].time}</div></div><div class="card-meta">${tags(s,s.ev[0])}</div></div><div class="details">${rows}</div>`;
+    container.appendChild(card);
+  });
+}
+
+// タブ2: 種目検索（組・レーン表示）
+const sel=document.getElementById('programSelect');
+function visiblePrograms(){const gen=genderState[2];return PROG.filter(p=>genMatch(gen,p.sex==='女子'));}
+function buildProgramSelect(){
+  const cur=sel.value;
+  sel.innerHTML='<option value="">── 種目を選んでください ──</option>';
+  visiblePrograms().forEach(p=>{const o=document.createElement('option');o.value=p.no;o.textContent=`No.${p.no}　${p.time}　${progLabel(p)}`;sel.appendChild(o);});
+  if([...sel.options].some(o=>o.value===cur))sel.value=cur;
+}
+buildProgramSelect();
+let focusIdx=-1;
+function stepProgram(d){
+  const list=visiblePrograms();
+  const i=list.findIndex(p=>String(p.no)===sel.value);
+  const j=i<0?(d>0?0:list.length-1):i+d;
+  if(j<0||j>=list.length)return;
+  sel.value=list[j].no;focusIdx=-1;searchByProgram();
+}
+function openProgram(no,idx){
+  if(!genMatch(genderState[2],progByNo[no].sex==='女子')){const el=document.querySelector('#gf2 .gchip');setGender(2,'all',el);}
+  sel.value=no;focusIdx=idx==null?-1:idx;
+  switchTab(2);searchByProgram();
+  const me=document.querySelector('.lane-row.me');if(me)me.scrollIntoView({block:'center'});
+}
+function searchByProgram(){
+  const container=document.getElementById('result2');
+  const statusBar=document.getElementById('statusBar2');
+  const list=visiblePrograms();
+  const i=list.findIndex(p=>String(p.no)===sel.value);
+  document.getElementById('prevBtn').disabled=i<=0;
+  document.getElementById('nextBtn').disabled=i<0||i>=list.length-1;
+  if(!sel.value){container.innerHTML='<div class="initial-state"><div class="emoji">📋</div><h3>種目から選手を検索</h3><p>上のリストから種目を選ぶと<br>組・レーンごとの出場選手を表示します</p></div>';statusBar.style.display='none';return;}
+  const p=progByNo[sel.value];
+  const isF=p.sex==='女子';
+  const entries=sw.flatMap(s=>s.ev.filter(e=>e.pno===p.no).map(e=>({s,e})));
+  const hlCount=highlightTeam?entries.filter(x=>x.s.sc===highlightTeam).length:0;
+  statusBar.style.display='block';
+  statusBar.innerHTML=`<span>${entries.length}</span>名がエントリー（${p.heats}組）`+(highlightTeam?`　⭐ ${esc(highlightTeam)} <span>${hlCount}</span>名`:'');
+  let html=`<div class="program-title">No.${p.no}　${esc(progLabel(p))}</div><div class="program-info">⏰ <b>${p.time}</b>〜　タイム決勝　｜　大会記録 <b>${p.rec}</b></div>`;
+  for(let h=1;h<=p.heats;h++){
+    html+=`<div class="heat-title ${isF?'female':'male'}">${isF?'🔴':'🔵'} ${h}組</div>`;
+    for(let l=1;l<=7;l++){
+      const x=entries.find(v=>v.e.heat===h&&v.e.lane===l);
+      if(!x){html+=`<div class="lane-row empty"><div class="lane-no">${l}</div><div class="lane-body">―</div></div>`;continue;}
+      const cls=['lane-row'];if(x.s.idx===focusIdx)cls.push('me');else if(highlightTeam&&x.s.sc===highlightTeam)cls.push('hl');
+      html+=`<div class="${cls.join(' ')}"><div class="lane-no">${l}</div><div class="lane-body"><div class="lane-name">${highlightTeam&&x.s.sc===highlightTeam?'⭐ ':''}${esc(x.s.name)}</div><div class="lane-meta">${tags(x.s,x.e)}</div></div></div>`;
+    }
+  }
+  container.innerHTML=html;
+}
+
+// タブ3: 競技順序
+function showOrder(){
+  const container=document.getElementById('result3');
+  const statusBar=document.getElementById('statusBar3');
+  const gen=genderState[3];
+  const list=PROG.filter(p=>genMatch(gen,p.sex==='女子'));
+  const cnt={};sw.forEach(s=>s.ev.forEach(e=>{cnt[e.pno]=(cnt[e.pno]||0)+1;}));
+  // 大会当日は次に始まる種目に印をつける
+  let nextNo=null;
+  const now=new Date();
+  const today=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  if(today===MEET_DATE){
+    const hm=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+    const n=list.find(p=>p.time.padStart(5,'0')>=hm);if(n)nextNo=n.no;
+  }
+  statusBar.style.display='block';
+  statusBar.innerHTML=`<span>${list.length}</span>種目　10:00 競技開始`;
+  container.innerHTML=list.map(p=>`<div class="order-row ${p.sex==='女子'?'female':''} ${p.no===nextNo?'next':''}" onclick="openProgram(${p.no})"><div class="order-time">${p.time}</div><div class="order-body"><div class="order-name">${esc(progLabel(p))}${p.no===nextNo?'　⏩ まもなく':''}</div><div class="order-sub">${p.heats}組・${cnt[p.no]||0}名　｜　大会記録 ${p.rec}</div></div><div class="order-no">No.${p.no}</div></div>`).join('')
+    +'<div class="order-foot">競技終了予定 11:39<br>閉会式 11:50〜12:00（予定）</div>';
+  const nx=container.querySelector('.order-row.next');if(nx)nx.scrollIntoView({block:'center'});
+}
+
+// 共通ユーティリティ
+function quickSearch(team,chipEl){
+  document.getElementById('searchInput').value=team;
+  chipsArea.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  if(chipEl)chipEl.classList.add('active');
+  doSearch(team);
+}
+document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.target.blur();doSearch();}});
+document.getElementById('searchInput').addEventListener('input',()=>{chipsArea.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));});
+
+</script>
+</body>
+</html>
